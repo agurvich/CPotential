@@ -27,9 +27,7 @@ def calculateCPotential(all_pos,all_masses,test_pos):
     exec_call = os.path.join(os.environ['HOME'],"python/CPotential/c_potential.so")
     c_obj = ctypes.CDLL(exec_call)
 
-    print 'test_pos',test_pos[0]
-    print exec_call
-    print "Calling the C executable"
+    print "Calling the C executable...",
     c_obj.calcDists(
         ctypes.c_int(Narr),
         xs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
@@ -44,6 +42,7 @@ def calculateCPotential(all_pos,all_masses,test_pos):
         test_zs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
 
         ctypes.byref(H_OUT))
+    print "Finished!"
 
     h=np.ctypeslib.as_array(H_OUT)
     return h

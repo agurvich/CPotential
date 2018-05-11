@@ -20,9 +20,9 @@ void printArray(float * arr,int Narr){
 float calculateGravityZ(float * point, float * masses, float * xs, float * ys, float * zs,int Narr){
     float summ = 0;
     for (int i =0; i<Narr; i++){
-        float dx = point[0]-xs[i];
-        float dy = point[1]-ys[i];
-        float dz = point[2]-zs[i];
+        float dx = xs[i]-point[0];
+        float dy = ys[i]-point[1];
+        float dz = zs[i]-point[2];
 
         float dr = sqrt(dx*dx + dy*dy + dz*dz); // RIP speed
         summ += masses[i]/(dr*dr*dr)*dz; 
