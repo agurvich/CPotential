@@ -30,6 +30,19 @@ float calculateGravityZ(float * point, float * masses, float * xs, float * ys, f
     return ALLTOGETHER*summ;//cgs
 }
 
+float calculateGravityR(float * point, float * masses, float * xs, float * ys, float * zs,int Narr){
+    float summ = 0;
+    for (int i =0; i<Narr; i++){
+        float dx = xs[i]-point[0];
+        float dy = ys[i]-point[1];
+        float dz = zs[i]-point[2];
+
+        float dr2 = dx*dx + dy*dy + dz*dz;
+        summ += masses[i]/dr2; 
+    }
+    return ALLTOGETHER*summ;//cgs
+}
+
 int calcDists(
     int Narr,
     float * xs, float * ys, float * zs,
