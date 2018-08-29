@@ -63,4 +63,30 @@ int calcDists(
     return 1;
 }
 
+int calcPairwiseDistsSquared(
+    int Narr,
+    float * xs, float * ys, float * zs,
+    float * H_OUT ){
 
+    float x,y,z;
+    float dx,dy,dz;
+    int count = 0;
+    // loop over each point in the array
+    for (int i=0; i<Narr; i++){
+        // pick out this point
+        x = xs[i];
+        y = ys[i];
+        z = zs[i];
+        // loop over the remaining points, starting with the next one
+        for (int j=i+1; j<Narr; j++){
+            // calculate the separation
+            dx = x - xs[j];
+            dy = y - ys[j];
+            dz = z - zs[j];
+
+            // put this square distance into the output array and move onto the next
+            H_OUT[count]=dx*dx + dy*dy + dz*dz;
+            count++;
+        }
+    }
+}
