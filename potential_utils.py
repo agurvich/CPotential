@@ -19,27 +19,26 @@ def exit(sleep_time=1):
     pass
     
 def subCalculateCPairwiseDistancesSquared(
-    ncutoff,
-    run,nruns,
+    test_xs,test_ys,test_zs,
     xs,ys,zs,
-    fin_array,
-    count,tot_count):
+    fin_array=None,
+    count=0,tot_count=0):
 
-    enter()
-    print("Working on subset",run+1,"out of",nruns)
-    test_xs = xs[run*ncutoff:(run+1)*ncutoff]
-    test_ys = ys[run*ncutoff:(run+1)*ncutoff]
-    test_zs = zs[run*ncutoff:(run+1)*ncutoff]
+    ## what are the lengths of the test and full arrays?
     Ntest = test_xs.shape[0]
     Narr = xs.shape[0]
 
-    #for i in range(Ntest):
-        #arr_size += (Narr-1)-count-i
-
-    ## partial arithmetic series sum formula 
+    ## how many pairwise distances will we be finding?
+    ##  use partial arithmetic series sum formula 
     ##  n/2 (a1 + an) 
     arr_size = int(Ntest/2.0 * (Narr - 1 - count + Narr - count - Ntest))
 
+    ## do we have a place to put the distances?
+    if fin_array is None:
+        fin_array = np.zeros(arr_size,dtype=np.float32)
+
+    ## if we're sub-stepping through the list, don't need to calculate distances
+    ##  for points we've already done
     new_xs = xs[count:]
     new_ys = ys[count:]
     new_zs = zs[count:]
@@ -64,8 +63,7 @@ def subCalculateCPairwiseDistancesSquared(
         fin_array.ctypes.data_as(ctypes.POINTER(ctypes.c_float)))
     print("... done!",)
 
-    exit()
-    return Ntest,arr_size
+    return arr_size,fin_array
 
 def calculateCPairwiseDistancesSquared(all_pos,ncutoff=2e4):
     ncutoff = int(ncutoff)
@@ -83,17 +81,23 @@ def calculateCPairwiseDistancesSquared(all_pos,ncutoff=2e4):
     if Narr > ncutoff:
         nruns = int(Narr/ncutoff) + ((Narr%ncutoff)!=0)
 
-        #big_dist_count
-        fin_array = np.zeros(10**10,dtype=np.float32)
+        fin_array = np.zeros(big_dist_count,dtype=np.float32)
 
         ## accumulation variables
         count = 0
         tot_count = 0
 
         for run in xrange(nruns):
-            Ntest,arr_size = subCalculateCPairwiseDistancesSquared(
-            ncutoff,
-            run,nruns,
+
+            test_xs = xs[run*ncutoff:(run+1)*ncutoff]
+            test_ys = ys[run*ncutoff:(run+1)*ncutoff]
+            test_zs = zs[run*ncutoff:(run+1)*ncutoff]
+
+            Ntest = test_xs.shape[0]
+
+            print("Working on subset",run+1,"out of",nruns)
+            arr_size,fin_array = subCalculateCPairwiseDistancesSquared(
+            test_xs,test_ys,test_zs,
             xs,ys,zs,
             fin_array,
             count,tot_count)
@@ -148,7 +152,7 @@ def calculateCPotential(all_pos,all_masses,test_pos):
     zs = copy.copy(zs)
 
     test_xs,test_ys,test_zs = test_pos.T
-     ## need to reallocate arrays in memory 
+    ## need to reallocate arrays in memory 
     test_xs = copy.copy(test_xs)
     test_ys = copy.copy(test_ys)
     test_zs = copy.copy(test_zs)
