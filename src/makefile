@@ -1,6 +1,6 @@
 EXEC   = c_potential.so
 
-SRCS   = *.c 
+SRCS   = c_pairwise_dist.c c_potential.c multi_potential.c
 
 
 OBJS   = $(SRCS:.c=.o)
@@ -24,4 +24,3 @@ $(OBJS): $(INCL)
 
 clean:
 	rm $(OBJS) $(EXEC)
-
