@@ -7,7 +7,7 @@ OBJS   = $(SRCS:.c=.o)
 INCL   = include.h #forcetree.h proto.h
 
 
-CFLAGS =  -std=c99 -shared -fPIC -O1 -fopenmp  #  -Wall
+CFLAGS =  -std=c99 -shared -fPIC -O3 -fopenmp  #  -Wall
 LNKCMD =  ld -L/usr/lib -L/usr/local/lib  -shared
 
 LIBS   =  -lm 

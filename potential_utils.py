@@ -141,7 +141,14 @@ def calculateCPairwiseDistancesSquared(all_pos,ncutoff=2e4):
         print(h.shape[0],'many distances')
         return h
 
-def calculateCPotential(all_pos,all_masses,test_pos,print_flag = 1,nthreads =1):
+def calculateCPotential(
+    all_pos,
+    all_masses,
+    test_pos,
+    print_flag = 1,
+    nthreads =1,
+    spherical=False,
+    ):
     ## recast 
     all_pos = all_pos.astype('f')
     all_masses = all_masses.astype('f')
@@ -179,13 +186,18 @@ def calculateCPotential(all_pos,all_masses,test_pos,print_flag = 1,nthreads =1):
     ##  consistent speedup. interestingly increasing either Ntest or Narr will
     ##  do it (even though only the Narr portion is actually multi-threaded). 
     if np.log10(Narr*Ntest) < 8:
-        warnings.warning("Not enough points for multi-threading to be useful, setting threads to 1")
+        warnings.warn("Not enough points for multi-threading to be useful, setting threads to 1")
         nthreads = 1
 
     if nthreads >1:
         if print_flag:
             print("Calling the Multi-C executable...",)
-        c_obj.multiCalculateZGravityAtLocations(
+        if not spherical:
+            func = c_obj.multiCalculateZGravityAtLocations
+        else:
+            func = c_obj.multiCalculateRGravityAtLocations
+
+        func(
             ctypes.c_int(nthreads),
             ctypes.c_int(Narr),
             xs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
@@ -203,7 +215,12 @@ def calculateCPotential(all_pos,all_masses,test_pos,print_flag = 1,nthreads =1):
     else:
         if print_flag:
             print("Calling the C executable...",)
-        c_obj.calculateZGravityAtLocations(
+        if not spherical:
+            func = c_obj.calculateZGravityAtLocations
+        else:
+            func = c_obj.calculateRGravityAtLocations
+
+        func(
             ctypes.c_int(Narr),
             xs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
             ys.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
@@ -217,6 +234,7 @@ def calculateCPotential(all_pos,all_masses,test_pos,print_flag = 1,nthreads =1):
             test_zs.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
 
             ctypes.byref(H_OUT))
+
     if print_flag:
         print("...done!")
 
