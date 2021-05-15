@@ -4,11 +4,13 @@ import numpy as np
 import ctypes
 import copy
 import time
-from memory_profiler import profile,memory_usage
 import itertools
 import warnings
 
-import pdb
+try:
+    from memory_profiler import profile,memory_usage
+except ImportError:
+    print("memory_profiler missing")
 
 def enter(sleep_time=1):
     init_time = time.time()
